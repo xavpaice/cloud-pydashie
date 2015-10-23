@@ -331,16 +331,9 @@ class NagiosSampler(BaseOpenstackSampler):
     def sample(self):
 
         try:
-            nagios.get_statusfiles(self._conf['services'])
-            servicestatus = nagios.parse_status(self._conf['services'])
-
-            criticals = 0
-            warnings = 0
-
-            for region in servicestatus:
-                criticals = criticals + servicestatus[region]['critical']
-                warnings = warnings + servicestatus[region]['warning']
-
+            servicestatus = nagios.get_statusfiles(self._conf['services'])
+            criticals = servicestatus['critical']
+            warnings = servicestatus['warning']
             status = 'green'
 
             if criticals > 0:
@@ -353,7 +346,8 @@ class NagiosSampler(BaseOpenstackSampler):
                  'status': status}
             return s
         except Exception, e:
-            print e
+            print "NagiosSampler failed with %s" % e
+
 
 
 class NagiosRegionSampler(BaseOpenstackSampler):
@@ -362,13 +356,12 @@ class NagiosRegionSampler(BaseOpenstackSampler):
 
     def sample(self):
         try:
-            nagios.get_statusfiles(self._conf['services'])
-            servicestatus = nagios.parse_status(self._conf['services'])
+            servicestatus = nagios.get_statusfiles(self._conf['services'])
 
             criticals = []
             warnings = []
 
-            for region in servicestatus:
+            for region in self._conf['services'].keys():
                 criticals.append({'label': region,
                                   'value': servicestatus[region]['critical']})
                 warnings.append({'label': region,
@@ -386,7 +379,7 @@ class NagiosRegionSampler(BaseOpenstackSampler):
 
             return {'criticals': criticals, 'warnings': warnings}
         except Exception, e:
-            print e
+            print "NagiosRegionSampler failed with %s" % e
 
 
 class ResourceSampler(BaseOpenstackSampler):
