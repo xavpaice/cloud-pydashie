@@ -1,0 +1,10 @@
+Flask
+CoffeeScript
+pyyaml
+python-novaclient
+python-neutronclient
+python-cinderclient
+python-keystoneclient
+paramiko
+pynag
+
